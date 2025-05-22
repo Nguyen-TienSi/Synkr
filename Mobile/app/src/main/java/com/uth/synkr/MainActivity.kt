@@ -3,13 +3,15 @@ package com.uth.synkr
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
+import com.uth.synkr.ui.theme.FriendAppTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContent {
+            FriendAppTheme {
+                FriendAppScreen()
+            }
         }
     }
 }
