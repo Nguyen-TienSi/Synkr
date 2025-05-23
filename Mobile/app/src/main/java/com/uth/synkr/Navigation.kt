@@ -11,6 +11,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import com.uth.synkr.model.User
 import com.uth.synkr.ui.screens.*
+import androidx.compose.material.icons.filled.Search
 
 @Composable
 fun FriendAppScreen() {
@@ -24,17 +25,19 @@ fun FriendAppScreen() {
 
     var selectedTab by remember { mutableStateOf(0) }
 
+    val tabTitles = listOf("Danh bạ", "Tìm kiếm", "Kết bạn")
+
     Scaffold(
         bottomBar = {
             NavigationBar {
-                listOf("Gợi ý", "Lời mời", "Bạn bè").forEachIndexed { index, title ->
+                tabTitles.forEachIndexed { index, title ->
                     NavigationBarItem(
                         icon = {
                             Icon(
                                 imageVector = when (index) {
-                                    0 -> Icons.Filled.PersonAdd
-                                    1 -> Icons.Filled.Notifications
-                                    else -> Icons.Filled.People
+                                    0 -> Icons.Filled.People      // Danh bạ
+                                    1 -> Icons.Filled.Search      // Tìm kiếm
+                                    else -> Icons.Filled.PersonAdd // Kết bạn
                                 },
                                 contentDescription = title
                             )
@@ -49,10 +52,11 @@ fun FriendAppScreen() {
     ) { padding ->
         Column(modifier = Modifier.padding(padding)) {
             when (selectedTab) {
-                0 -> SuggestedFriendsScreen(dummyUsers, {}, {})
-                1 -> FriendRequestsScreen(dummyUsers, {}, {})
-                2 -> FriendsListScreen(dummyUsers, {}, {})
+                0 -> FriendsListScreen(dummyUsers, {}, {})         // Danh bạ
+                1 -> SuggestedFriendsScreen(dummyUsers, {}, {})    // Tìm kiếm
+                2 -> FriendRequestsScreen(dummyUsers, {}, {})      // Kết bạn
             }
         }
     }
 }
+

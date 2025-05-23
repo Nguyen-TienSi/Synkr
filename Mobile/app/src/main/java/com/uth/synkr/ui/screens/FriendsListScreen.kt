@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment
 
 @Composable
 fun FriendsListScreen(users: List<User>, onCall: (User) -> Unit, onVideoCall: (User) -> Unit) {
+    Text("    Bạn bè", style = MaterialTheme.typography.titleLarge)
     LazyColumn(modifier = Modifier.padding(16.dp)) {
         items(users) { user ->
             Row(
