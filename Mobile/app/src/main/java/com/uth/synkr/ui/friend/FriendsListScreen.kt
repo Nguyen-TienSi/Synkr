@@ -1,4 +1,4 @@
-package com.uth.synkr.ui.screens
+package com.uth.synkr.ui.friend
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
