@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">Synkr</string>
+    <string name="default_web_client_id">102004382268-j58n8o9bj3uqer6inu8qentht4ll7ho1.apps.googleusercontent.com</string>
+
+    <string name="facebook_app_id">2510883829277168</string>
+    <string name="fb_login_protocol_scheme">fb2510883829277168</string>
+    <string name="facebook_client_token">ebdcdf4ae0f25309b2fc36b1f450b573</string>
+
 </resources>

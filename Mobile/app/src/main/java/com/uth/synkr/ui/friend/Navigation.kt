@@ -1,4 +1,4 @@
-package com.uth.synkr
+package com.uth.synkr.ui.friend
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
@@ -18,9 +18,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.uth.synkr.model.User
-import com.uth.synkr.ui.friend.FriendRequestsScreen
-import com.uth.synkr.ui.friend.FriendsListScreen
-import com.uth.synkr.ui.friend.SuggestedFriendsScreen
 
 @Composable
 fun FriendAppScreen() {
