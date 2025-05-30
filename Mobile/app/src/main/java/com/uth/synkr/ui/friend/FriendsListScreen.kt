@@ -27,12 +27,12 @@ fun FriendsListScreen(users: List<User>, onCall: (User) -> Unit, onVideoCall: (U
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Image(
-                    painter = rememberAsyncImagePainter(user.avatarUrl),
+                    painter = rememberAsyncImagePainter(user.pictureUrl),
                     contentDescription = null,
                     modifier = Modifier.size(48.dp).clip(CircleShape)
                 )
                 Spacer(Modifier.width(8.dp))
-                Text(user.name, modifier = Modifier.weight(1f))
+                Text(user.fullName, modifier = Modifier.weight(1f))
                 IconButton(onClick = { onCall(user) }) {
                     Icon(Icons.Default.Call, contentDescription = "Call")
                 }

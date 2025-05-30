@@ -25,12 +25,12 @@ fun FriendItem(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Image(
-            painter = rememberAsyncImagePainter(user.avatarUrl),
+            painter = rememberAsyncImagePainter(user.pictureUrl),
             contentDescription = null,
             modifier = Modifier.size(48.dp).clip(CircleShape)
         )
         Spacer(Modifier.width(8.dp))
-        Text(user.name, modifier = Modifier.weight(1f))
+        Text(user.fullName, modifier = Modifier.weight(1f))
         Button(onClick = onAdd, colors = ButtonDefaults.buttonColors(containerColor = Color.Blue)) {
             Text(buttonLabel, color = Color.White)
         }
