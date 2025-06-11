@@ -8,5 +8,6 @@ data class Message(
     val receiverId: String,
     val content: String,
     val timestamp: Date,
-    val type: MessageType
+    val type: MessageType,
+    val conversationId: String
 )
