@@ -8,6 +8,7 @@ import com.facebook.FacebookSdk
 import com.facebook.appevents.AppEventsLogger
 import com.google.firebase.auth.FirebaseAuth
 import com.uth.synkr.data.firebase.FirebaseAuthenticationManager
+import com.uth.synkr.ui.chat.ChatScreen
 
 class MainActivity : ComponentActivity() {
     private lateinit var authManager: FirebaseAuthenticationManager
@@ -23,9 +24,10 @@ class MainActivity : ComponentActivity() {
         firebaseAuth = FirebaseAuth.getInstance()
         authManager = FirebaseAuthenticationManager(this)
 
+
         setContent {
             MaterialTheme {
-                NavigationManager(authManager)
+                ChatScreen("ekegggggggggggggggkek", null)
             }
         }
     }

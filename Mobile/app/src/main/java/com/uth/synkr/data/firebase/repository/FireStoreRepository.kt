@@ -6,8 +6,8 @@ import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.tasks.await
 
 open class FireStoreRepository<T : Any>(
-    private val collectionPath: String,
-    private val itemClass: Class<T>
+    protected val collectionPath: String,
+    protected val itemClass: Class<T>
 ) {
 
     private val firestore: FirebaseFirestore = Firebase.firestore

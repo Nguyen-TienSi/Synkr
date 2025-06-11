@@ -58,6 +58,8 @@ dependencies {
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.navigation.compose)
+    implementation("androidx.compose.foundation:foundation:1.4.3")
+
 
     // Retrofit
     implementation(libs.retrofit)
