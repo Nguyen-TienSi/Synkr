@@ -18,14 +18,25 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.uth.synkr.model.User
+import com.uth.synkr.model.enumeration.UserStatus
+import java.util.Date
 
 @Composable
 fun FriendAppScreen() {
     val dummyUsers = remember {
         listOf(
-            User("1", "Peter", "https://randomuser.me/api/portraits/men/1.jpg"),
-            User("2", "Lucy", "https://randomuser.me/api/portraits/women/2.jpg"),
-            User("3", "Tom", "https://randomuser.me/api/portraits/men/3.jpg")
+            User(
+                "1", "Peter", "https://randomuser.me/api/portraits/men/1.jpg", "example@gmail.com",
+                UserStatus.ONLINE, Date()
+            ),
+            User(
+                "2", "Lucy", "https://randomuser.me/api/portraits/women/2.jpg", "example@gmail.com",
+                UserStatus.BUSY, Date()
+            ),
+            User(
+                "3", "Tom", "https://randomuser.me/api/portraits/men/3.jpg", "example@gmail.com",
+                UserStatus.OFFLINE, Date()
+            ),
         )
     }
 
