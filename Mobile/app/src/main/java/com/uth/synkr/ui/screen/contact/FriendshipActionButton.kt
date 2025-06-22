@@ -8,7 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 
 enum class FriendshipAction {
-    ADD, UNFRIEND, CANCEL
+    ADD, ACCEPT, REJECT, UNFRIEND, CANCEL
 }
 
 @Composable
@@ -16,7 +16,9 @@ fun FriendshipActionButton(
     action: FriendshipAction, onClick: () -> Unit, modifier: Modifier = Modifier
 ) {
     val (text, color) = when (action) {
-        FriendshipAction.ADD -> "Add Friend" to Color(0xFF007BFF)
+        FriendshipAction.ADD -> "Add" to Color(0xFF007BFF)
+        FriendshipAction.ACCEPT -> "Accept" to Color(0xFF28A745)
+        FriendshipAction.REJECT -> "Reject" to Color(0xFFDC3545)
         FriendshipAction.UNFRIEND -> "Unfriend" to Color(0xFF007BFF)
         FriendshipAction.CANCEL -> "Cancel" to Color.Gray
     }

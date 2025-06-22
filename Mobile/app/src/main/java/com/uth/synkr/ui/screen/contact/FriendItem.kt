@@ -19,14 +19,19 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.uth.synkr.data.model.User
+import com.uth.synkr.data.model.enumeration.FriendshipStatus
 
 @Composable
 fun FriendItem(
     user: User,
-    isFriend: Boolean,
+    friendshipStatus: FriendshipStatus?,
+    isRequester: Boolean = false,
+    isAddressee: Boolean = false,
     onAddFriend: () -> Unit,
-    onUnfriend: () -> Unit,
-    onCancel: () -> Unit = {}
+    onAccept: () -> Unit = {},
+    onUnfriend: () -> Unit = {},
+    onCancel: () -> Unit = {},
+    onReject: () -> Unit = {}
 ) {
     Row(
         modifier = Modifier
@@ -47,13 +52,34 @@ fun FriendItem(
         Text(
             text = user.fullName, modifier = Modifier.weight(1f)
         )
-        FriendshipActionButton(
-            action = if (isFriend) FriendshipAction.UNFRIEND else FriendshipAction.ADD, onClick = {
-                if (isFriend) {
-                    onUnfriend()
-                } else {
-                    onAddFriend()
+        when (friendshipStatus) {
+            FriendshipStatus.ACCEPTED -> {
+                FriendshipActionButton(
+                    action = FriendshipAction.UNFRIEND, onClick = onUnfriend
+                )
+            }
+
+            FriendshipStatus.PENDING -> {
+                if (isAddressee) {
+                    FriendshipActionButton(
+                        action = FriendshipAction.ACCEPT, onClick = onAccept
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    FriendshipActionButton(
+                        action = FriendshipAction.REJECT, onClick = onReject
+                    )
+                } else if (isRequester) {
+                    FriendshipActionButton(
+                        action = FriendshipAction.CANCEL, onClick = onCancel
+                    )
                 }
-            })
+            }
+
+            else -> {
+                FriendshipActionButton(
+                    action = FriendshipAction.ADD, onClick = onAddFriend
+                )
+            }
+        }
     }
 }

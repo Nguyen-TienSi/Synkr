@@ -60,7 +60,7 @@ fun NavGraph(authManager: FirebaseAuthManager) {
             RootScreen(
                 navController = navController, currentRoute = AppRoute.CONTACTS
             ) {
-                ContactScreen()
+                ContactScreen(currentUserId = authManager.getCurrentUser()!!.uid)
             }
         }
         composable(AppRoute.PROFILE) {
