@@ -25,12 +25,21 @@ open class GenericRepository(
     suspend inline fun <reified T> execute(request: ApiRequest): ApiResult<T> {
         return try {
             val response = when (request.method) {
-                HttpMethod.GET -> api.get(request.url, request.queryParams ?: emptyMap(), request.headers)
+                HttpMethod.GET -> api.get(
+                    request.url,
+                    request.queryParams ?: emptyMap(),
+                    request.headers
+                )
+
                 HttpMethod.POST -> api.post(request.url, request.body ?: Unit, request.headers)
                 HttpMethod.PUT -> api.put(request.url, request.body ?: Unit, request.headers)
                 HttpMethod.PATCH -> api.patch(request.url, request.body ?: Unit, request.headers)
                 HttpMethod.DELETE -> api.delete(request.url, request.headers)
-                HttpMethod.HEAD -> api.head(request.url, request.queryParams ?: emptyMap(), request.headers)
+                HttpMethod.HEAD -> api.head(
+                    request.url,
+                    request.queryParams ?: emptyMap(),
+                    request.headers
+                )
             }
 
             if (response.isSuccessful) {
@@ -65,19 +74,23 @@ open class GenericRepository(
         }
     }
 
-    suspend inline fun <T> safeApiCall(emitter: RemoteErrorEmitter, crossinline responseFunction: suspend () -> T): T? {
-        return try{
-            val response = withContext(Dispatchers.IO){ responseFunction.invoke() }
+    suspend inline fun <T> safeApiCall(
+        emitter: RemoteErrorEmitter,
+        crossinline responseFunction: suspend () -> T
+    ): T? {
+        return try {
+            val response = withContext(Dispatchers.IO) { responseFunction.invoke() }
             response
-        }catch (e: Exception){
-            withContext(Dispatchers.Main){
+        } catch (e: Exception) {
+            withContext(Dispatchers.Main) {
                 e.printStackTrace()
                 Log.e("ApiCalls", "Call error: ${e.localizedMessage}", e.cause)
-                when(e){
+                when (e) {
                     is HttpException -> {
                         val body = e.response()?.errorBody()
                         emitter.onError(getErrorMessage(body))
                     }
+
                     is SocketTimeoutException -> emitter.onError(ErrorType.TIMEOUT)
                     is IOException -> emitter.onError(ErrorType.NETWORK)
                     else -> emitter.onError(ErrorType.UNKNOWN)

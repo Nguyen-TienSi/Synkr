@@ -11,11 +11,12 @@ sealed class ApiResult<out T> {
         Loading -> throw NotImplementedError("An operation is not implemented.")
     }
 
-    fun <T> ApiResult<T>.orElseThrow(exception: (String, Throwable?) -> Throwable): T = when (this) {
-        is Success -> this.data
-        is Error -> throw exception(message, cause)
-        Loading -> throw NotImplementedError("An operation is not implemented.")
-    }
+    fun <T> ApiResult<T>.orElseThrow(exception: (String, Throwable?) -> Throwable): T =
+        when (this) {
+            is Success -> this.data
+            is Error -> throw exception(message, cause)
+            Loading -> throw NotImplementedError("An operation is not implemented.")
+        }
 
     fun <T> ApiResult<T>.orElseGet(fallback: () -> T): T = when (this) {
         is Success -> this.data

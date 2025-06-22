@@ -58,9 +58,13 @@ dependencies {
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.navigation.compose)
-    implementation("androidx.compose.foundation:foundation:1.4.3")
-
-
+    implementation(libs.androidx.foundation)
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    implementation(libs.androidx.lifecycle.runtime.compose)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.kotlinx.coroutines.android)
+    
     // Retrofit
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter.gson)
