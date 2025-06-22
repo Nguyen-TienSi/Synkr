@@ -10,12 +10,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.navigation.NavController
+import com.google.firebase.auth.FirebaseUser
 import com.uth.synkr.navigation.AppRoute
 import kotlinx.coroutines.launch
 
 @Composable
 fun RootScreen(
-    navController: NavController, currentRoute: String, content: @Composable () -> Unit
+    navController: NavController,
+    currentRoute: String,
+    currentUser: FirebaseUser?,
+    content: @Composable () -> Unit
 ) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val coroutineScope = rememberCoroutineScope()
@@ -24,7 +28,8 @@ fun RootScreen(
     ModalNavigationDrawer(
         drawerState = drawerState, drawerContent = {
             NavDrawer(
-                selectedItem = selectedItem, onItemSelected = { label ->
+                selectedItem = selectedItem,
+                onItemSelected = { label ->
                     selectedItem = label
                     coroutineScope.launch { drawerState.close() }
                     when (label) {
@@ -32,7 +37,11 @@ fun RootScreen(
                         "Contacts" -> navController.navigate(AppRoute.CONTACTS)
                         "Profile" -> navController.navigate(AppRoute.PROFILE)
                     }
-                })
+                },
+                userName = currentUser?.displayName ?: "Unknown",
+                userEmail = currentUser?.email ?: "",
+                userPhotoUrl = currentUser?.photoUrl?.toString()
+            )
         }) {
         MainLayout(
             title = when (currentRoute) {

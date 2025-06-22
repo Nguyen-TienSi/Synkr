@@ -18,12 +18,8 @@ class ConversationService(
         conversationRepository.delete(id)
     }
 
-    suspend fun getConversation(id: String): Conversation? {
+    suspend fun getConversationById(id: String): Conversation? {
         return conversationRepository.get(id)
-    }
-
-    suspend fun getAllConversations(): List<Conversation> {
-        return conversationRepository.getAll()
     }
 
     suspend fun getConversationsByParticipant(userId: String): List<Conversation> {

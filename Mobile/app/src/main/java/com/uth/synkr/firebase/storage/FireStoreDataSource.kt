@@ -23,7 +23,7 @@ open class FireStoreDataSource<T : Any>(
         firestore.collection(collectionPath).document(docId).delete().await()
     }
 
-    suspend fun get(docId: String): T? {
+    open suspend fun get(docId: String): T? {
         val document = firestore.collection(collectionPath).document(docId).get().await()
         return document.toObject(itemClass)
     }

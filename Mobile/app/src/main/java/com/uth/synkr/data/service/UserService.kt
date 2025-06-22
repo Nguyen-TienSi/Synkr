@@ -31,9 +31,12 @@ class UserService(
         }
     }
 
-    suspend fun getFriendsOfUser(currentUserId: String): List<User> {
+    suspend fun getFriendsOfUser(
+        currentUserId: String,
+        friendshipStatusList: List<FriendshipStatus>
+    ): List<User> {
         val friendships = friendshipRepository.getAllFriendshipsOfUserWithStatuses(
-            currentUserId, listOf(FriendshipStatus.ACCEPTED, FriendshipStatus.PENDING)
+            currentUserId, friendshipStatusList
         )
         val friendIds = friendships.mapNotNull {
             when {

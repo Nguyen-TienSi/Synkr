@@ -7,4 +7,6 @@ object AppRoute {
     const val HOME = "home"
     const val PROFILE = "profile"
     const val CONTACTS = "contacts"
+    const val CONVERSATION_CREATION = "conversation_creation"
+    const val CONVERSATION = "conversation"
 }

@@ -32,12 +32,16 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.rememberAsyncImagePainter
 import com.uth.synkr.R
 
 @Composable
 fun NavDrawer(
     selectedItem: String,
-    onItemSelected: (String) -> Unit
+    onItemSelected: (String) -> Unit,
+    userName: String,
+    userEmail: String,
+    userPhotoUrl: String? = null
 ) {
     Column(
         modifier = Modifier
@@ -54,22 +58,30 @@ fun NavDrawer(
                 .padding(bottom = 24.dp), horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Spacer(modifier = Modifier.height(32.dp))
-            Image(
-                painter = painterResource(id = R.drawable.sample_profile_pic),
-                contentDescription = "Profile Picture",
-                modifier = Modifier
-                    .size(80.dp)
-                    .clip(CircleShape)
-            )
+            if (userPhotoUrl != null) {
+                // Use Coil or Glide for loading network images
+                Image(
+                    painter = rememberAsyncImagePainter(userPhotoUrl),
+                    contentDescription = "Profile Picture",
+                    modifier = Modifier
+                        .size(80.dp)
+                        .clip(CircleShape)
+                )
+            } else {
+                Image(
+                    painter = painterResource(id = R.drawable.sample_profile_pic),
+                    contentDescription = "Profile Picture",
+                    modifier = Modifier
+                        .size(80.dp)
+                        .clip(CircleShape)
+                )
+            }
             Spacer(modifier = Modifier.height(12.dp))
             Text(
-                text = "Cristina Kardashian",
-                color = Color.White,
-                fontWeight = FontWeight.Bold,
-                fontSize = 20.sp
+                text = userName, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 20.sp
             )
             Text(
-                text = "cristina@gmail.com", color = Color.White, fontSize = 15.sp
+                text = userEmail, color = Color.White, fontSize = 15.sp
             )
         }
         // Navigation Items
@@ -85,26 +97,22 @@ fun NavDrawer(
                 label = "Home",
                 selected = selectedItem == "Home",
                 selectedColor = Color(0xFF2962FF),
-                onClick = { onItemSelected("Home") }
-            )
+                onClick = { onItemSelected("Home") })
             DrawerItem(
                 icon = Icons.Filled.Group,
                 label = "Contacts",
                 selected = selectedItem == "Contacts",
-                onClick = { onItemSelected("Contacts") }
-            )
+                onClick = { onItemSelected("Contacts") })
             DrawerItem(
                 icon = Icons.Filled.Search,
                 label = "Search",
                 selected = selectedItem == "Search",
-                onClick = { onItemSelected("Search") }
-            )
+                onClick = { onItemSelected("Search") })
             DrawerItem(
                 icon = Icons.Filled.Person,
                 label = "Profile",
                 selected = selectedItem == "Profile",
-                onClick = { onItemSelected("Profile") }
-            )
+                onClick = { onItemSelected("Profile") })
         }
     }
 }

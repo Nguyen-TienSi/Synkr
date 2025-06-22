@@ -16,6 +16,8 @@ import com.uth.synkr.ui.screen.auth.SignUpScreen
 import com.uth.synkr.ui.screen.contact.ContactScreen
 import com.uth.synkr.ui.screen.home.HomeScreen
 import com.uth.synkr.ui.screen.profile.ProfileScreen
+import com.uth.synkr.ui.screen.conversation.ConversationCreationScreen
+import com.uth.synkr.ui.screen.conversation.ConversationScreen
 import kotlinx.coroutines.launch
 
 @Composable
@@ -51,21 +53,30 @@ fun NavGraph(authManager: FirebaseAuthManager) {
         }
         composable(AppRoute.HOME) {
             RootScreen(
-                navController = navController, currentRoute = AppRoute.HOME
+                navController = navController,
+                currentRoute = AppRoute.HOME,
+                currentUser = currentUser
             ) {
-                HomeScreen()
+                HomeScreen(
+                    currentUserId = currentUser!!.uid,
+                    navController = navController
+                )
             }
         }
         composable(AppRoute.CONTACTS) {
             RootScreen(
-                navController = navController, currentRoute = AppRoute.CONTACTS
+                navController = navController,
+                currentRoute = AppRoute.CONTACTS,
+                currentUser = currentUser
             ) {
-                ContactScreen(currentUserId = authManager.getCurrentUser()!!.uid)
+                ContactScreen(currentUserId = currentUser!!.uid)
             }
         }
         composable(AppRoute.PROFILE) {
             RootScreen(
-                navController = navController, currentRoute = AppRoute.PROFILE
+                navController = navController,
+                currentRoute = AppRoute.PROFILE,
+                currentUser = currentUser
             ) {
                 ProfileScreen(
                     onLogout = {
@@ -80,6 +91,19 @@ fun NavGraph(authManager: FirebaseAuthManager) {
                     onSettings = { navController.popBackStack() },
                     onContactUs = { navController.popBackStack() })
             }
+        }
+        composable(AppRoute.CONVERSATION_CREATION) {
+            ConversationCreationScreen(
+                currentUserId = currentUser!!.uid,
+                onBack = { navController.popBackStack() },
+            )
+        }
+        composable("${AppRoute.CONVERSATION}/{conversationId}") { backStackEntry ->
+            val conversationId = backStackEntry.arguments?.getString("conversationId") ?: ""
+            ConversationScreen(
+                conversationId = conversationId,
+                currentUserId = currentUser!!.uid
+            )
         }
     }
 }

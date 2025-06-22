@@ -9,9 +9,16 @@ class ConversationRepository : FireStoreDataSource<Conversation>(
     itemClass = Conversation::class.java
 ) {
     suspend fun getByParticipant(userId: String): List<Conversation> {
-        val snapshot =
-            firestore.collection(collectionPath).whereArrayContains("participants", userId).get()
-                .await()
-        return snapshot.toObjects(itemClass)
+        val snapshot = firestore.collection(collectionPath)
+            .whereArrayContains("participantIds", userId)
+            .get().await()
+        return snapshot.documents.mapNotNull { doc ->
+            doc.toObject(itemClass)?.apply { id = doc.id }
+        }
+    }
+
+    override suspend fun get(id: String): Conversation? {
+        val doc = firestore.collection(collectionPath).document(id).get().await()
+        return doc.toObject(itemClass)?.apply { this.id = doc.id }
     }
 }

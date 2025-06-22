@@ -24,7 +24,11 @@ class FriendListViewModel(
 
     fun loadFriends(currentUserId: String) {
         viewModelScope.launch {
-            val users = userService.getFriendsOfUser(currentUserId)
+            val friendshipStatusList = listOf(
+                FriendshipStatus.ACCEPTED,
+                FriendshipStatus.PENDING
+            )
+            val users = userService.getFriendsOfUser(currentUserId, friendshipStatusList)
             _friends.value = users
         }
     }
