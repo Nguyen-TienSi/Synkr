@@ -10,24 +10,17 @@ import java.util.concurrent.TimeUnit
 object ApiClient {
     private const val BASE_URL = ""
 
-    private val okHttpClient: OkHttpClient = OkHttpClient.Builder()
-        .addInterceptor { chain ->
-            val request = chain.request().newBuilder()
-                .addHeader("Authorization", "Bearer TOKEN")
-                .build()
+    private val okHttpClient: OkHttpClient = OkHttpClient.Builder().addInterceptor { chain ->
+            val request =
+                chain.request().newBuilder().addHeader("Authorization", "Bearer TOKEN").build()
             chain.proceed(request)
-        }
-        .connectTimeout(30, TimeUnit.SECONDS)
-        .readTimeout(30, TimeUnit.SECONDS)
-        .writeTimeout(30, TimeUnit.SECONDS)
-        .build()
+        }.connectTimeout(30, TimeUnit.SECONDS).readTimeout(30, TimeUnit.SECONDS)
+        .writeTimeout(30, TimeUnit.SECONDS).build()
 
     private val retrofit: Retrofit by lazy {
-        Retrofit.Builder()
-            .baseUrl(BASE_URL)
+        Retrofit.Builder().baseUrl(BASE_URL)
             .addConverterFactory(MoshiConverterFactory.create(JsonAdapterFactory.moshi))
-            .client(okHttpClient)
-            .build()
+            .client(okHttpClient).build()
     }
 
     val genericApiService: GenericApiService by lazy {

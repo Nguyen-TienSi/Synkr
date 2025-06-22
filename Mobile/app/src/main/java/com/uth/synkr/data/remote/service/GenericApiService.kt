@@ -23,29 +23,22 @@ interface GenericApiService {
 
     @POST
     suspend fun post(
-        @Url url: String,
-        @Body body: Any,
-        @HeaderMap headers: Map<String, String> = emptyMap()
+        @Url url: String, @Body body: Any, @HeaderMap headers: Map<String, String> = emptyMap()
     ): Response<ResponseBody>
 
     @PUT
     suspend fun put(
-        @Url url: String,
-        @Body body: Any,
-        @HeaderMap headers: Map<String, String> = emptyMap()
+        @Url url: String, @Body body: Any, @HeaderMap headers: Map<String, String> = emptyMap()
     ): Response<ResponseBody>
 
     @PATCH
     suspend fun patch(
-        @Url url: String,
-        @Body body: Any,
-        @HeaderMap headers: Map<String, String> = emptyMap()
+        @Url url: String, @Body body: Any, @HeaderMap headers: Map<String, String> = emptyMap()
     ): Response<ResponseBody>
 
     @DELETE
     suspend fun delete(
-        @Url url: String,
-        @HeaderMap headers: Map<String, String> = emptyMap()
+        @Url url: String, @HeaderMap headers: Map<String, String> = emptyMap()
     ): Response<ResponseBody>
 
     @HEAD
@@ -53,5 +46,5 @@ interface GenericApiService {
         @Url url: String,
         @QueryMap queryParams: Map<String, String> = emptyMap(),
         @HeaderMap headers: Map<String, String> = emptyMap()
-    ) : Response<ResponseBody>
+    ): Response<ResponseBody>
 }
