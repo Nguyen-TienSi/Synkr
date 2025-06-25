@@ -24,16 +24,12 @@ open class FireStoreDataSource<T : Any>(
     }
 
     open suspend fun get(docId: String): T? {
-        val document = firestore.collection(collectionPath).document(docId).get().await()
-        return document.toObject(itemClass)
+        val docRef = firestore.collection(collectionPath).document(docId).get().await()
+        return docRef.toObject(itemClass)
     }
 
     suspend fun getAll(): List<T> {
         val snapshot = firestore.collection(collectionPath).get().await()
         return snapshot.toObjects(itemClass)
-    }
-
-    suspend fun setWithId(docId: String, item: T) {
-        firestore.collection(collectionPath).document(docId).set(item).await()
     }
 }

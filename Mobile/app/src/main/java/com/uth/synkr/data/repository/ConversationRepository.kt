@@ -5,7 +5,7 @@ import com.uth.synkr.firebase.storage.FireStoreDataSource
 import kotlinx.coroutines.tasks.await
 
 class ConversationRepository : FireStoreDataSource<Conversation>(
-    collectionPath = Conversation::class.java.simpleName.lowercase().toString(),
+    collectionPath = Conversation::class.java.simpleName.lowercase(),
     itemClass = Conversation::class.java
 ) {
     suspend fun getByParticipant(userId: String): List<Conversation> {
@@ -17,8 +17,8 @@ class ConversationRepository : FireStoreDataSource<Conversation>(
         }
     }
 
-    override suspend fun get(id: String): Conversation? {
-        val doc = firestore.collection(collectionPath).document(id).get().await()
+    override suspend fun get(docId: String): Conversation? {
+        val doc = firestore.collection(collectionPath).document(docId).get().await()
         return doc.toObject(itemClass)?.apply { this.id = doc.id }
     }
 }

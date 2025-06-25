@@ -14,10 +14,10 @@ import com.uth.synkr.ui.screen.auth.ForgotPasswordScreen
 import com.uth.synkr.ui.screen.auth.SignInScreen
 import com.uth.synkr.ui.screen.auth.SignUpScreen
 import com.uth.synkr.ui.screen.contact.ContactScreen
-import com.uth.synkr.ui.screen.home.HomeScreen
-import com.uth.synkr.ui.screen.profile.ProfileScreen
 import com.uth.synkr.ui.screen.conversation.ConversationCreationScreen
 import com.uth.synkr.ui.screen.conversation.ConversationScreen
+import com.uth.synkr.ui.screen.home.HomeScreen
+import com.uth.synkr.ui.screen.profile.ProfileScreen
 import kotlinx.coroutines.launch
 
 @Composable
@@ -59,8 +59,14 @@ fun NavGraph(authManager: FirebaseAuthManager) {
             ) {
                 HomeScreen(
                     currentUserId = currentUser!!.uid,
-                    navController = navController
-                )
+                    onConversationSelected = { conversationId ->
+                        navController.navigate("${AppRoute.CONVERSATION}/$conversationId")
+                    },
+                    onCreateConversation = {
+                        navController.navigate(AppRoute.CONVERSATION_CREATION) {
+                            launchSingleTop = true
+                        }
+                    })
             }
         }
         composable(AppRoute.CONTACTS) {
@@ -101,8 +107,7 @@ fun NavGraph(authManager: FirebaseAuthManager) {
         composable("${AppRoute.CONVERSATION}/{conversationId}") { backStackEntry ->
             val conversationId = backStackEntry.arguments?.getString("conversationId") ?: ""
             ConversationScreen(
-                conversationId = conversationId,
-                currentUserId = currentUser!!.uid
+                conversationId = conversationId, currentUserId = currentUser!!.uid
             )
         }
     }

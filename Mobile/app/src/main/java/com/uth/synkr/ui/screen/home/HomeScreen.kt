@@ -11,13 +11,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
-import com.uth.synkr.navigation.AppRoute
 
 @Composable
 fun HomeScreen(
     currentUserId: String,
-    navController: NavController,
+    onConversationSelected: (String) -> Unit,
+    onCreateConversation: () -> Unit,
     viewModel: HomeViewModel = viewModel()
 ) {
     val conversationsState = viewModel.conversations.collectAsState()
@@ -29,16 +28,14 @@ fun HomeScreen(
 
     Scaffold(
         floatingActionButton = {
-            FloatingActionButton(onClick = {
-                navController.navigate(AppRoute.CONVERSATION_CREATION)
-            }) {
+            FloatingActionButton(onClick = onCreateConversation) {
                 Icon(Icons.Default.Add, contentDescription = "Add Conversation")
             }
         }) { innerPadding ->
         LazyColumn(contentPadding = innerPadding) {
             items(conversations) { conversation ->
                 ConversationItem(conversation) {
-                    navController.navigate("${AppRoute.CONVERSATION}/${conversation.id}")
+                    onConversationSelected(conversation.id ?: "")
                 }
             }
         }

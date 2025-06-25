@@ -10,8 +10,7 @@ class UserService(
     private val friendshipRepository: FriendshipRepository = FriendshipRepository(),
 ) {
     suspend fun createUser(user: User): String {
-        userRepository.setUserDocWithUid(user.uid, user)
-        return user.uid
+        return userRepository.add(user)
     }
 
     suspend fun getByFullNameLike(fullName: String): List<User> {
@@ -33,10 +32,10 @@ class UserService(
 
     suspend fun getFriendsOfUser(
         currentUserId: String,
-        friendshipStatusList: List<FriendshipStatus>
+        friendshipStatuses: List<FriendshipStatus>
     ): List<User> {
-        val friendships = friendshipRepository.getAllFriendshipsOfUserWithStatuses(
-            currentUserId, friendshipStatusList
+        val friendships = friendshipRepository.getByStatuses(
+            currentUserId, friendshipStatuses
         )
         val friendIds = friendships.mapNotNull {
             when {
@@ -46,6 +45,6 @@ class UserService(
             }
         }.distinct()
 
-        return friendIds.mapNotNull { userRepository.getById(it) }
+        return friendIds.mapNotNull { userRepository.getByUid(it) }
     }
 }

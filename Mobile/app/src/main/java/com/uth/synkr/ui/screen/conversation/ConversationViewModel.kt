@@ -39,10 +39,10 @@ class ConversationViewModel(
             val message = Message(senderId = senderId, content = content)
             val messageId = messageService.createMessage(message)
             // Update conversation's messageIds
-            val updatedConv = conversation.copy(messageIds = conversation.messageIds + messageId)
-            conversationService.updateConversation(conversation.id!!, updatedConv)
-            _conversation.value = updatedConv
-            loadMessages(updatedConv)
+            val updatedConversation = conversation.copy(messageIds = conversation.messageIds + messageId)
+            conversationService.updateConversation(conversation.id!!, updatedConversation)
+            _conversation.value = updatedConversation
+            loadMessages(updatedConversation)
         }
     }
 }
