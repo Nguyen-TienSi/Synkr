@@ -1,6 +1,0 @@
-@Synkr_HostAddress = http://localhost:5208
-
-GET {{Synkr_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
