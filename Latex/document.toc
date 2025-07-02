@@ -1,0 +1,5 @@
+\contentsline {section}{\numberline {1}Giới thiệu}{3}{}%
+\contentsline {section}{\numberline {2}Phương pháp}{3}{}%
+\contentsline {subsection}{\numberline {2.1}Thu thập dữ liệu}{3}{}%
+\contentsline {subsection}{\numberline {2.2}Phân tích dữ liệu}{3}{}%
+\contentsline {section}{\numberline {3}Kết quả}{3}{}%
