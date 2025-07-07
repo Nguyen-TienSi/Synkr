@@ -18,6 +18,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.uth.synkr.data.model.User
 import com.uth.synkr.data.model.enumeration.UserStatus
 import com.uth.synkr.data.service.UserService
+import com.uth.synkr.firebase.auth.FirebaseAuthManager
+import com.uth.synkr.constant.SocialProvider
 import kotlinx.coroutines.launch
 
 @Composable
@@ -25,7 +27,7 @@ fun SocialIconButton(
     iconRes: Int,
     contentDescription: String,
     enabled: Boolean = true,
-    authManager: com.uth.synkr.firebase.auth.FirebaseAuthManager,
+    authManager: FirebaseAuthManager,
     onSignInSuccess: () -> Unit,
     setLoading: (Boolean) -> Unit,
     setError: (String?) -> Unit,
@@ -87,8 +89,4 @@ fun SocialIconButton(
             modifier = Modifier.size(20.dp)
         )
     }
-}
-
-enum class SocialProvider {
-    GOOGLE, FACEBOOK
 }

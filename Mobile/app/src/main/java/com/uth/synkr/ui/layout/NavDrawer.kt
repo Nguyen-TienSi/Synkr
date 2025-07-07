@@ -33,6 +33,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
+import com.uth.synkr.ui.layout.DrawerItem
 import com.uth.synkr.R
 
 @Composable
@@ -114,38 +115,5 @@ fun NavDrawer(
                 selected = selectedItem == "Profile",
                 onClick = { onItemSelected("Profile") })
         }
-    }
-}
-
-@Composable
-private fun DrawerItem(
-    icon: ImageVector,
-    label: String,
-    selected: Boolean,
-    selectedColor: Color = Color.Black,
-    onClick: () -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = 24.dp, top = 8.dp, bottom = 8.dp)
-            .background(if (selected) Color(0x112962FF) else Color.Transparent)
-            .padding(vertical = 8.dp)
-            .clickable { onClick() }, // Make row clickable
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = label,
-            tint = if (selected) selectedColor else Color.Black,
-            modifier = Modifier.size(28.dp)
-        )
-        Spacer(modifier = Modifier.size(16.dp))
-        Text(
-            text = label,
-            color = if (selected) selectedColor else Color.Black,
-            fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
-            fontSize = 18.sp
-        )
     }
 }

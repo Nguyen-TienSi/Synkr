@@ -40,6 +40,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
 import com.uth.synkr.R
 import com.uth.synkr.data.model.User
+import com.uth.synkr.ui.screen.conversation.UserListItem
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -88,47 +89,6 @@ fun ConversationCreationScreen(
                         }
                     })
             }
-        }
-    }
-}
-
-@Composable
-fun UserListItem(
-    user: User, selected: Boolean, onClick: () -> Unit
-) {
-    Row(modifier = Modifier
-        .fillMaxWidth()
-        .clickable { onClick() }
-        .padding(horizontal = 16.dp, vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically) {
-        // Avatar
-        if (user.pictureUrl.isNotEmpty()) {
-            Image(
-                painter = rememberAsyncImagePainter(user.pictureUrl),
-                contentDescription = "Avatar",
-                modifier = Modifier
-                    .size(48.dp)
-                    .clip(CircleShape)
-            )
-        } else {
-            Icon(
-                painter = painterResource(id = R.drawable.sample_profile_pic),
-                contentDescription = "Avatar",
-                modifier = Modifier.size(48.dp)
-            )
-        }
-        Spacer(modifier = Modifier.width(16.dp))
-        // Name
-        Text(
-            text = user.fullName, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f)
-        )
-        // Checkmark if selected
-        if (selected) {
-            Icon(
-                imageVector = Icons.Default.CheckCircle,
-                contentDescription = "Selected",
-                tint = Color.Black
-            )
         }
     }
 }

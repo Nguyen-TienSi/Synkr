@@ -50,6 +50,9 @@ import com.uth.synkr.R
 import com.uth.synkr.firebase.auth.AuthResponse
 import com.uth.synkr.firebase.auth.FirebaseAuthManager
 import kotlinx.coroutines.launch
+import com.uth.synkr.constant.SocialProvider
+import com.uth.synkr.ui.screen.auth.DividerWithTextCentered
+import com.uth.synkr.ui.screen.auth.PasswordRequirement
 
 @Composable
 fun SignUpScreen(
@@ -288,25 +291,5 @@ fun SignUpScreen(
                 color = MaterialTheme.colorScheme.primary
             )
         }
-    }
-}
-
-@Composable
-fun PasswordRequirement(met: Boolean, text: String) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(vertical = 2.dp)
-    ) {
-        Icon(
-            imageVector = if (met) Icons.Default.Check else Icons.Default.Close,
-            contentDescription = null,
-            tint = if (met) Color.Green else Color.Gray,
-            modifier = Modifier.size(16.dp)
-        )
-        Spacer(modifier = Modifier.width(8.dp))
-        Text(
-            text = text,
-            style = MaterialTheme.typography.bodySmall,
-            color = if (met) Color.Green else Color.Gray
-        )
     }
 }

@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import com.uth.synkr.R
 import com.uth.synkr.firebase.auth.AuthResponse
 import com.uth.synkr.firebase.auth.FirebaseAuthManager
+import com.uth.synkr.constant.SocialProvider
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
