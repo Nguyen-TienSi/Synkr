@@ -47,4 +47,19 @@ class UserService(
 
         return friendIds.mapNotNull { userRepository.getByUid(it) }
     }
+
+    suspend fun getUsersByIds(userIds: List<String>): List<User> {
+        return userIds.mapNotNull { userId ->
+            userRepository.getByUid(userId)
+        }
+    }
+
+    suspend fun getUserById(userId: String): User? {
+        return userRepository.getByUid(userId)
+    }
+
+    suspend fun updateUser(user: User) {
+        // For updating user profile - would need to add update method to repository
+        // userRepository.update(user.uid, user)
+    }
 }

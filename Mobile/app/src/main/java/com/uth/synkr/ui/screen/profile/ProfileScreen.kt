@@ -19,109 +19,219 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Call
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.uth.synkr.R
+import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.rememberAsyncImagePainter
+import com.uth.synkr.data.model.User
 
 @Composable
 fun ProfileScreen(
-    userName: String = "Cristina Kardashian",
-    userEmail: String = "cristina@gmail.com",
+    currentUserId: String,
     onLogout: () -> Unit = {},
     onAccountDetails: () -> Unit = {},
     onSettings: () -> Unit = {},
     onContactUs: () -> Unit = {},
-    onChangeAvatar: () -> Unit = {}
+    onChangeAvatar: () -> Unit = {},
+    viewModel: ProfileViewModel = viewModel { ProfileViewModel() }
 ) {
+    val uiState by viewModel.uiState.collectAsState()
+    
+    LaunchedEffect(currentUserId) {
+        viewModel.loadUserProfile(currentUserId)
+    }
+    
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(top = 24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Profile Picture with Edit Button
-        Box(
-            modifier = Modifier
-                .size(120.dp)
-                .padding(top = 16.dp),
-            contentAlignment = Alignment.BottomEnd
-        ) {
+        when {
+            uiState.isLoading -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
+            
+            uiState.error != null -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = uiState.error ?: "Unknown error",
+                        color = MaterialTheme.colorScheme.error,
+                        textAlign = TextAlign.Center
+                    )
+                }
+            }
+            
+            uiState.user != null -> {
+                ProfileContent(
+                    user = uiState.user!!,
+                    onLogout = onLogout,
+                    onAccountDetails = onAccountDetails,
+                    onSettings = onSettings,
+                    onContactUs = onContactUs,
+                    onChangeAvatar = onChangeAvatar
+                )
+            }
+            
+            else -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "No user data available",
+                        textAlign = TextAlign.Center
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ProfileContent(
+    user: User,
+    onLogout: () -> Unit,
+    onAccountDetails: () -> Unit,
+    onSettings: () -> Unit,
+    onContactUs: () -> Unit,
+    onChangeAvatar: () -> Unit
+) {
+    // Profile Picture with Edit Button
+    Box(
+        modifier = Modifier
+            .size(120.dp)
+            .padding(top = 16.dp),
+        contentAlignment = Alignment.BottomEnd
+    ) {
+        if (user.pictureUrl.isNotBlank()) {
             Image(
-                painter = painterResource(id = R.drawable.sample_profile_pic),
+                painter = rememberAsyncImagePainter(user.pictureUrl),
                 contentDescription = "Profile Picture",
                 modifier = Modifier
                     .size(110.dp)
                     .clip(CircleShape)
+                    .background(Color.LightGray, CircleShape),
+                contentScale = ContentScale.Crop
             )
-            IconButton(
-                onClick = onChangeAvatar,
+        } else {
+            // Fallback for missing profile picture
+            Box(
                 modifier = Modifier
-                    .offset(x = (-8).dp, y = (-8).dp)
-                    .size(36.dp)
-                    .background(Color(0xFF2962FF), CircleShape)
+                    .size(110.dp)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.primary),
+                contentAlignment = Alignment.Center
             ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.sample_profile_pic),
-                    contentDescription = "Change Avatar",
-                    tint = Color.White,
-                    modifier = Modifier.size(20.dp)
+                Text(
+                    text = user.fullName.take(1).uppercase(),
+                    style = MaterialTheme.typography.headlineLarge,
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
             }
         }
-        Spacer(modifier = Modifier.height(12.dp))
+        
+        IconButton(
+            onClick = onChangeAvatar,
+            modifier = Modifier
+                .offset(x = (-8).dp, y = (-8).dp)
+                .size(36.dp)
+                .background(MaterialTheme.colorScheme.primary, CircleShape)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Edit,
+                contentDescription = "Change Avatar",
+                tint = MaterialTheme.colorScheme.onPrimary,
+                modifier = Modifier.size(20.dp)
+            )
+        }
+    }
+    
+    Spacer(modifier = Modifier.height(12.dp))
+    
+    Text(
+        text = user.fullName.ifBlank { "Unknown User" },
+        style = MaterialTheme.typography.headlineSmall,
+        color = MaterialTheme.colorScheme.onSurface
+    )
+    
+    if (user.email.isNotBlank()) {
+        Spacer(modifier = Modifier.height(4.dp))
         Text(
-            text = userName, fontSize = 22.sp, color = Color.Black
+            text = user.email,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
-        Spacer(modifier = Modifier.height(24.dp))
+    }
+    
+    Spacer(modifier = Modifier.height(24.dp))
 
-        // Menu Items
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 32.dp)
-        ) {
-            ProfileMenuItem(
-                icon = Icons.Filled.AccountCircle,
-                text = "Account Details",
-                onClick = onAccountDetails
-            )
-            ProfileMenuItem(
-                icon = Icons.Filled.Settings, text = "Settings", onClick = onSettings
-            )
-            ProfileMenuItem(
-                icon = Icons.Filled.Call,
-                text = "Contact Us",
-                onClick = onContactUs,
-                iconTint = Color(0xFF4CAF50),
-                textColor = Color.Gray
-            )
-        }
+    // Menu Items
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 32.dp)
+    ) {
+        ProfileMenuItem(
+            icon = Icons.Filled.AccountCircle,
+            text = "Account Details",
+            onClick = onAccountDetails
+        )
+        ProfileMenuItem(
+            icon = Icons.Filled.Settings, 
+            text = "Settings", 
+            onClick = onSettings
+        )
+        ProfileMenuItem(
+            icon = Icons.Filled.Call,
+            text = "Contact Us",
+            onClick = onContactUs,
+            iconTint = Color(0xFF4CAF50),
+            textColor = Color.Gray
+        )
+    }
 
-        Spacer(modifier = Modifier.height(32.dp))
+    Spacer(modifier = Modifier.height(32.dp))
 
-        // Logout Button
-        OutlinedButton(
-            onClick = onLogout,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 32.dp),
-            shape = RoundedCornerShape(8.dp)
-        ) {
-            Text(
-                text = "Logout", color = Color.Black, fontSize = 16.sp
-            )
-        }
+    // Logout Button
+    OutlinedButton(
+        onClick = onLogout,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 32.dp),
+        shape = RoundedCornerShape(8.dp)
+    ) {
+        Text(
+            text = "Logout", 
+            color = MaterialTheme.colorScheme.onSurface, 
+            fontSize = 16.sp
+        )
     }
 }
 
@@ -130,8 +240,8 @@ fun ProfileMenuItem(
     icon: androidx.compose.ui.graphics.vector.ImageVector,
     text: String,
     onClick: () -> Unit,
-    iconTint: Color = Color(0xFF2962FF),
-    textColor: Color = Color.Black
+    iconTint: Color = MaterialTheme.colorScheme.primary,
+    textColor: Color = MaterialTheme.colorScheme.onSurface
 ) {
     Row(modifier = Modifier
         .fillMaxWidth()
@@ -146,7 +256,9 @@ fun ProfileMenuItem(
         )
         Spacer(modifier = Modifier.width(16.dp))
         Text(
-            text = text, color = textColor, fontSize = 16.sp
+            text = text, 
+            color = textColor, 
+            fontSize = 16.sp
         )
     }
 }

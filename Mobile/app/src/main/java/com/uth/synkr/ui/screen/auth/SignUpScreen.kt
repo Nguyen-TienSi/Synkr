@@ -1,8 +1,11 @@
 package com.uth.synkr.ui.screen.auth
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -29,52 +33,47 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.uth.synkr.R
-import com.uth.synkr.firebase.auth.AuthResponse
 import com.uth.synkr.firebase.auth.FirebaseAuthManager
-import kotlinx.coroutines.launch
 import com.uth.synkr.constant.SocialProvider
 import com.uth.synkr.ui.screen.auth.DividerWithTextCentered
 import com.uth.synkr.ui.screen.auth.PasswordRequirement
+import androidx.compose.runtime.remember
 
 @Composable
 fun SignUpScreen(
     authManager: FirebaseAuthManager,
     onSignInSuccess: () -> Unit,
     onNavigateToSignIn: () -> Unit,
+    viewModel: SignUpViewModel = viewModel { SignUpViewModel(authManager) }
 ) {
-    var name by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
-    var phone by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var confirmPassword by remember { mutableStateOf("") }
-    var isLoading by remember { mutableStateOf(false) }
-    var errorMessage by remember { mutableStateOf<String?>(null) }
-    var passwordVisible by remember { mutableStateOf(false) }
-    var confirmPasswordVisible by remember { mutableStateOf(false) }
+    val uiState by viewModel.uiState.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
 
-    val coroutineScope = rememberCoroutineScope()
-
-    val isFormValid by remember {
-        derivedStateOf {
-            name.isNotBlank() && email.isNotBlank() && phone.isNotBlank() && password.isNotBlank() && confirmPassword.isNotBlank() && password == confirmPassword && password.length >= 6
+    // Show error as snackbar
+    LaunchedEffect(uiState.error) {
+        uiState.error?.let { message ->
+            snackbarHostState.showSnackbar(message)
+            viewModel.clearError()
         }
     }
 
@@ -83,6 +82,11 @@ fun SignUpScreen(
             .fillMaxSize()
             .padding(16.dp), contentAlignment = Alignment.Center
     ) {
+        // SnackbarHost for error display
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier.align(Alignment.TopCenter)
+        )
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -97,19 +101,10 @@ fun SignUpScreen(
                 text = "Create Account", style = MaterialTheme.typography.headlineMedium
             )
 
-            // Error message
-            errorMessage?.let { message ->
-                Text(
-                    text = message,
-                    color = MaterialTheme.colorScheme.error,
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-
             // Name field
             OutlinedTextField(
-                value = name,
-                onValueChange = { name = it },
+                value = uiState.name,
+                onValueChange = { viewModel.updateName(it) },
                 label = { Text("Full Name") },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
@@ -120,8 +115,8 @@ fun SignUpScreen(
 
             // Email field
             OutlinedTextField(
-                value = email,
-                onValueChange = { email = it },
+                value = uiState.email,
+                onValueChange = { viewModel.updateEmail(it) },
                 label = { Text("Email") },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
@@ -133,8 +128,8 @@ fun SignUpScreen(
 
             // Phone field
             OutlinedTextField(
-                value = phone,
-                onValueChange = { phone = it },
+                value = uiState.phone,
+                onValueChange = { viewModel.updatePhone(it) },
                 label = { Text("Phone Number") },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
@@ -146,17 +141,17 @@ fun SignUpScreen(
 
             // Password field
             OutlinedTextField(
-                value = password,
-                onValueChange = { password = it },
+                value = uiState.password,
+                onValueChange = { viewModel.updatePassword(it) },
                 label = { Text("Password") },
                 modifier = Modifier.fillMaxWidth(),
-                visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                visualTransformation = if (uiState.passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 trailingIcon = {
-                    IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                    IconButton(onClick = { viewModel.updatePasswordVisible(!uiState.passwordVisible) }) {
                         Icon(
-                            if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                            contentDescription = if (passwordVisible) "Hide password" else "Show password"
+                            if (uiState.passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
+                            contentDescription = if (uiState.passwordVisible) "Hide password" else "Show password"
                         )
                     }
                 },
@@ -165,17 +160,17 @@ fun SignUpScreen(
 
             // Confirm Password field
             OutlinedTextField(
-                value = confirmPassword,
-                onValueChange = { confirmPassword = it },
+                value = uiState.confirmPassword,
+                onValueChange = { viewModel.updateConfirmPassword(it) },
                 label = { Text("Confirm Password") },
                 modifier = Modifier.fillMaxWidth(),
-                visualTransformation = if (confirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                visualTransformation = if (uiState.confirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 trailingIcon = {
-                    IconButton(onClick = { confirmPasswordVisible = !confirmPasswordVisible }) {
+                    IconButton(onClick = { viewModel.updateConfirmPasswordVisible(!uiState.confirmPasswordVisible) }) {
                         Icon(
-                            if (confirmPasswordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                            contentDescription = if (confirmPasswordVisible) "Hide password" else "Show password"
+                            if (uiState.confirmPasswordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
+                            contentDescription = if (uiState.confirmPasswordVisible) "Hide password" else "Show password"
                         )
                     }
                 },
@@ -183,56 +178,47 @@ fun SignUpScreen(
             )
 
             // Password requirements
-            if (password.isNotBlank()) {
+            val passwordGuideNeeded = uiState.password.isNotBlank() && (
+                uiState.password.length < 8 ||
+                !uiState.password.any { it.isDigit() } ||
+                uiState.password == uiState.password.lowercase() ||
+                uiState.password != uiState.confirmPassword ||
+                uiState.confirmPassword.isBlank()
+            )
+            if (passwordGuideNeeded) {
                 Column(modifier = Modifier.fillMaxWidth()) {
                     PasswordRequirement(
-                        met = password.length >= 8, text = "At least 8 characters"
+                        met = uiState.password.length >= 8, text = "At least 8 characters"
                     )
                     PasswordRequirement(
-                        met = password.any { it.isDigit() }, text = "Contains a number"
+                        met = uiState.password.any { it.isDigit() }, text = "Contains a number"
                     )
                     PasswordRequirement(
-                        met = password != password.lowercase(), text = "Contains uppercase"
+                        met = uiState.password != uiState.password.lowercase(), text = "Contains uppercase"
                     )
                     PasswordRequirement(
-                        met = password == confirmPassword && confirmPassword.isNotBlank(),
+                        met = uiState.password == uiState.confirmPassword && uiState.confirmPassword.isNotBlank(),
                         text = "Passwords match"
                     )
                 }
             }
 
-            // Sign Up button
+            // Sign Up button (triggers Firebase Auth + Firestore user creation)
             Button(
                 onClick = {
-                    if (isFormValid) {
-                        coroutineScope.launch {
-                            isLoading = true
-                            authManager.createAccountWithEmail(email, password)
-                                .collect { response ->
-                                    when (response) {
-                                        is AuthResponse.Success -> onSignInSuccess()
-                                        is AuthResponse.Error -> {
-                                            errorMessage = response.message
-                                            isLoading = false
-                                        }
-                                    }
-                                }
-                        }
-                    } else {
-                        errorMessage = "Please fill all fields correctly"
-                    }
+                    viewModel.signUp(onSignInSuccess)
                 },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp),
                 shape = RoundedCornerShape(25.dp),
-                enabled = isFormValid && !isLoading,
+                enabled = viewModel.isFormValid && !uiState.isLoading,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.primary,
                     contentColor = MaterialTheme.colorScheme.onPrimary
                 )
             ) {
-                if (isLoading) {
+                if (uiState.isLoading) {
                     CircularProgressIndicator(
                         color = MaterialTheme.colorScheme.onPrimary, strokeWidth = 2.dp
                     )
@@ -248,27 +234,41 @@ fun SignUpScreen(
                 horizontalArrangement = Arrangement.spacedBy(24.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                SocialIconButton(
-                    iconRes = R.drawable.ic_google,
-                    contentDescription = "Sign up with Google",
-                    enabled = !isLoading,
-                    authManager = authManager,
-                    onSignInSuccess = onSignInSuccess,
-                    setLoading = { isLoading = it },
-                    setError = { errorMessage = it },
-                    provider = SocialProvider.GOOGLE
-                )
+                androidx.compose.material3.OutlinedButton(
+                    onClick = { viewModel.signUpWithGoogle(onSignInSuccess) },
+                    enabled = !uiState.isLoading,
+                    shape = androidx.compose.foundation.shape.CircleShape,
+                    contentPadding = androidx.compose.foundation.layout.PaddingValues(12.dp),
+                    modifier = Modifier.size(48.dp),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = MaterialTheme.colorScheme.onSurface
+                    )
+                ) {
+                    androidx.compose.foundation.Image(
+                        painter = androidx.compose.ui.res.painterResource(id = R.drawable.ic_google),
+                        contentDescription = "Sign up with Google",
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
 
-                SocialIconButton(
-                    iconRes = R.drawable.ic_facebook,
-                    contentDescription = "Sign up with Facebook",
-                    enabled = !isLoading,
-                    authManager = authManager,
-                    onSignInSuccess = onSignInSuccess,
-                    setLoading = { isLoading = it },
-                    setError = { errorMessage = it },
-                    provider = SocialProvider.FACEBOOK
-                )
+                androidx.compose.material3.OutlinedButton(
+                    onClick = { viewModel.signUpWithFacebook(onSignInSuccess) },
+                    enabled = !uiState.isLoading,
+                    shape = androidx.compose.foundation.shape.CircleShape,
+                    contentPadding = androidx.compose.foundation.layout.PaddingValues(12.dp),
+                    modifier = Modifier.size(48.dp),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = MaterialTheme.colorScheme.onSurface
+                    )
+                ) {
+                    androidx.compose.foundation.Image(
+                        painter = androidx.compose.ui.res.painterResource(id = R.drawable.ic_facebook),
+                        contentDescription = "Sign up with Facebook",
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
             }
 
             // Already have an account? Sign in
@@ -285,7 +285,7 @@ fun SignUpScreen(
             Spacer(modifier = Modifier.height(16.dp))
         }
 
-        if (isLoading) {
+        if (uiState.isLoading) {
             CircularProgressIndicator(
                 modifier = Modifier.align(Alignment.Center),
                 color = MaterialTheme.colorScheme.primary

@@ -8,6 +8,7 @@ data class User(
     val fullName: String = "",
     val pictureUrl: String = "",
     val email: String = "",
+    val phoneNumber: String = "",
     val status: UserStatus = UserStatus.ONLINE,
     val lastSeen: Timestamp? = null
 )

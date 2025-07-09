@@ -5,7 +5,8 @@ import com.uth.synkr.data.model.enumeration.FriendshipStatus
 import com.uth.synkr.data.repository.FriendshipRepository
 
 class FriendshipService(
-    private val friendshipRepository: FriendshipRepository = FriendshipRepository()
+    private val friendshipRepository: FriendshipRepository = FriendshipRepository(),
+    private val conversationService: ConversationService = ConversationService()
 ) {
     suspend fun getFriendship(userId: String, friendId: String): Friendship? {
         return friendshipRepository.getByRequesterAndAddressee(userId, friendId)
@@ -25,6 +26,9 @@ class FriendshipService(
             requesterId = requesterId, addresseeId = userId, status = FriendshipStatus.ACCEPTED
         )
         friendshipRepository.update(friendship)
+        
+        // Create private conversation when friendship is accepted
+        conversationService.getOrCreatePrivateConversation(userId, requesterId)
     }
 
     suspend fun rejectRequest(userId: String, requesterId: String) {

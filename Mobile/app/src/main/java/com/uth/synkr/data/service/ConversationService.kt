@@ -25,4 +25,25 @@ class ConversationService(
     suspend fun getConversationsByParticipant(userId: String): List<Conversation> {
         return conversationRepository.getByParticipant(userId)
     }
+
+    suspend fun getOrCreatePrivateConversation(userId1: String, userId2: String): Conversation {
+        val existingConversation = conversationRepository.findPrivateConversationByParticipants(userId1, userId2)
+        
+        return if (existingConversation != null) {
+            existingConversation
+        } else {
+            val newConversation = Conversation(
+                name = "", // Private conversations typically don't have names
+                participantIds = listOf(userId1, userId2),
+                messageIds = emptyList()
+                // conversationType defaults to ConversationType.PRIVATE
+            )
+            val conversationId = conversationRepository.add(newConversation)
+            newConversation.copy(id = conversationId)
+        }
+    }
+
+    suspend fun findPrivateConversationBetweenUsers(userId1: String, userId2: String): Conversation? {
+        return conversationRepository.findPrivateConversationByParticipants(userId1, userId2)
+    }
 }

@@ -1,10 +1,12 @@
 package com.uth.synkr.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -23,8 +25,13 @@ import kotlinx.coroutines.launch
 @Composable
 fun NavGraph(authManager: FirebaseAuthManager) {
     val navController = rememberNavController()
-    val currentUser by remember { mutableStateOf(authManager.getCurrentUser()) }
+    var currentUser by remember { mutableStateOf(authManager.getCurrentUser()) }
     val coroutineScope = rememberCoroutineScope()
+
+    // Update currentUser when auth state changes
+    LaunchedEffect(Unit) {
+        currentUser = authManager.getCurrentUser()
+    }
 
     NavHost(
         navController = navController,
@@ -34,6 +41,7 @@ fun NavGraph(authManager: FirebaseAuthManager) {
             SignInScreen(
                 authManager = authManager,
                 onSignInSuccess = {
+                    currentUser = authManager.getCurrentUser()
                     navController.navigate(AppRoute.HOME) {
                         popUpTo(AppRoute.SIGN_IN) { inclusive = true }
                     }
@@ -43,6 +51,7 @@ fun NavGraph(authManager: FirebaseAuthManager) {
         }
         composable(AppRoute.SIGN_UP) {
             SignUpScreen(authManager = authManager, onSignInSuccess = {
+                currentUser = authManager.getCurrentUser()
                 navController.navigate(AppRoute.HOME) {
                     popUpTo(AppRoute.SIGN_UP) { inclusive = true }
                 }
@@ -52,63 +61,112 @@ fun NavGraph(authManager: FirebaseAuthManager) {
             ForgotPasswordScreen()
         }
         composable(AppRoute.HOME) {
-            RootScreen(
-                navController = navController,
-                currentRoute = AppRoute.HOME,
-                currentUser = currentUser
-            ) {
-                HomeScreen(
-                    currentUserId = currentUser!!.uid,
-                    onConversationSelected = { conversationId ->
-                        navController.navigate("${AppRoute.CONVERSATION}/$conversationId")
-                    },
-                    onCreateConversation = {
-                        navController.navigate(AppRoute.CONVERSATION_CREATION) {
-                            launchSingleTop = true
-                        }
-                    })
+            currentUser?.let { user ->
+                RootScreen(
+                    navController = navController,
+                    currentRoute = AppRoute.HOME,
+                    currentUser = user
+                ) {
+                    HomeScreen(
+                        currentUserId = user.uid,
+                        onConversationSelected = { conversationId: String ->
+                            navController.navigate("${AppRoute.CONVERSATION}/$conversationId")
+                        },
+                        onCreateConversation = {
+                            navController.navigate(AppRoute.CONVERSATION_CREATION) {
+                                launchSingleTop = true
+                            }
+                        })
+                }
+            } ?: run {
+                // If user is null, navigate back to sign in
+                LaunchedEffect(Unit) {
+                    navController.navigate(AppRoute.SIGN_IN) {
+                        popUpTo(AppRoute.HOME) { inclusive = true }
+                    }
+                }
             }
         }
         composable(AppRoute.CONTACTS) {
-            RootScreen(
-                navController = navController,
-                currentRoute = AppRoute.CONTACTS,
-                currentUser = currentUser
-            ) {
-                ContactScreen(currentUserId = currentUser!!.uid)
+            currentUser?.let { user ->
+                RootScreen(
+                    navController = navController,
+                    currentRoute = AppRoute.CONTACTS,
+                    currentUser = user
+                ) {
+                    ContactScreen(currentUserId = user.uid)
+                }
+            } ?: run {
+                // If user is null, navigate back to sign in
+                LaunchedEffect(Unit) {
+                    navController.navigate(AppRoute.SIGN_IN) {
+                        popUpTo(AppRoute.CONTACTS) { inclusive = true }
+                    }
+                }
             }
         }
         composable(AppRoute.PROFILE) {
-            RootScreen(
-                navController = navController,
-                currentRoute = AppRoute.PROFILE,
-                currentUser = currentUser
-            ) {
-                ProfileScreen(
-                    onLogout = {
-                    coroutineScope.launch {
-                        authManager.signOut()
-                        navController.navigate(AppRoute.SIGN_IN) {
-                            popUpTo(AppRoute.PROFILE) { inclusive = true }
-                        }
+            currentUser?.let { user ->
+                RootScreen(
+                    navController = navController,
+                    currentRoute = AppRoute.PROFILE,
+                    currentUser = user
+                ) {
+                    ProfileScreen(
+                        currentUserId = user.uid,
+                        onLogout = {
+                            coroutineScope.launch {
+                                authManager.signOut()
+                                currentUser = null
+                                navController.navigate(AppRoute.SIGN_IN) {
+                                    popUpTo(AppRoute.PROFILE) { inclusive = true }
+                                }
+                            }
+                        },
+                        onAccountDetails = { navController.popBackStack() },
+                        onSettings = { navController.popBackStack() },
+                        onContactUs = { navController.popBackStack() })
+                }
+            } ?: run {
+                // If user is null, navigate back to sign in
+                LaunchedEffect(Unit) {
+                    navController.navigate(AppRoute.SIGN_IN) {
+                        popUpTo(AppRoute.PROFILE) { inclusive = true }
                     }
-                },
-                    onAccountDetails = { navController.popBackStack() },
-                    onSettings = { navController.popBackStack() },
-                    onContactUs = { navController.popBackStack() })
+                }
             }
         }
         composable(AppRoute.CONVERSATION_CREATION) {
-            ConversationCreationScreen(
-                currentUserId = currentUser!!.uid,
-                onBack = { navController.popBackStack() },
-            )
+            currentUser?.let { user ->
+                ConversationCreationScreen(
+                    currentUserId = user.uid,
+                    onBack = { navController.popBackStack() },
+                )
+            } ?: run {
+                // If user is null, navigate back to sign in
+                LaunchedEffect(Unit) {
+                    navController.navigate(AppRoute.SIGN_IN) {
+                        popUpTo(AppRoute.CONVERSATION_CREATION) { inclusive = true }
+                    }
+                }
+            }
         }
         composable("${AppRoute.CONVERSATION}/{conversationId}") { backStackEntry ->
             val conversationId = backStackEntry.arguments?.getString("conversationId") ?: ""
-            ConversationScreen(
-                conversationId = conversationId, currentUserId = currentUser!!.uid
-            )
+            currentUser?.let { user ->
+                ConversationScreen(
+                    conversationId = conversationId, 
+                    currentUserId = user.uid,
+                    onBack = { navController.popBackStack() }
+                )
+            } ?: run {
+                // If user is null, navigate back to sign in
+                LaunchedEffect(Unit) {
+                    navController.navigate(AppRoute.SIGN_IN) {
+                        popUpTo("${AppRoute.CONVERSATION}/{conversationId}") { inclusive = true }
+                    }
+                }
+            }
         }
     }
 }

@@ -31,7 +31,8 @@ fun FriendItem(
     onAccept: () -> Unit = {},
     onUnfriend: () -> Unit = {},
     onCancel: () -> Unit = {},
-    onReject: () -> Unit = {}
+    onReject: () -> Unit = {},
+    isLoading: Boolean = false
 ) {
     Row(
         modifier = Modifier
@@ -55,29 +56,39 @@ fun FriendItem(
         when (friendshipStatus) {
             FriendshipStatus.ACCEPTED -> {
                 FriendshipActionButton(
-                    action = FriendshipAction.UNFRIEND, onClick = onUnfriend
+                    action = FriendshipAction.UNFRIEND, 
+                    onClick = onUnfriend,
+                    isLoading = isLoading
                 )
             }
 
             FriendshipStatus.PENDING -> {
                 if (isAddressee) {
                     FriendshipActionButton(
-                        action = FriendshipAction.ACCEPT, onClick = onAccept
+                        action = FriendshipAction.ACCEPT, 
+                        onClick = onAccept,
+                        isLoading = isLoading
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     FriendshipActionButton(
-                        action = FriendshipAction.REJECT, onClick = onReject
+                        action = FriendshipAction.REJECT, 
+                        onClick = onReject,
+                        isLoading = isLoading
                     )
                 } else if (isRequester) {
                     FriendshipActionButton(
-                        action = FriendshipAction.CANCEL, onClick = onCancel
+                        action = FriendshipAction.CANCEL, 
+                        onClick = onCancel,
+                        isLoading = isLoading
                     )
                 }
             }
 
             else -> {
                 FriendshipActionButton(
-                    action = FriendshipAction.ADD, onClick = onAddFriend
+                    action = FriendshipAction.ADD, 
+                    onClick = onAddFriend,
+                    isLoading = isLoading
                 )
             }
         }
